@@ -2,7 +2,9 @@
 #import "IPDFCameraViewController.h"
 
 @implementation ScannerView
-
+{
+  BOOL _autoCaptureEnabled;
+}
 - (instancetype)init{
   self = [super init];
 
@@ -25,7 +27,7 @@
 
 
   if (self) {
-
+    _autoCaptureEnabled = true;
     [self setEnableBorderDetection:YES];
     [self setDelegate: self];
   }
@@ -46,8 +48,12 @@
   printf("on picture taken");
 }
 
--(void) onRectangleDetect {
-  printf("on rect detect");
+-(void) onRectangleDetect:(BOOL)isDetected {
+  // Flutter에 isDetected 값을 전달
+  dispatch_async(dispatch_get_main_queue(), ^{
+      printf("calling flutter onRectangleDetected");
+      [self->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
+  });
 }
 
 //- (void)setChannelBrightness:(float)brightness {
@@ -60,6 +66,9 @@
 
 
 - (void) didDetectRectangle:(CIRectangleFeature *)rectangle withType:(IPDFRectangeType)type {
+  if (!_autoCaptureEnabled) {
+    return;
+  }
   switch (type) {
     case IPDFRectangeTypeGood:
       self.stableCounter ++;
@@ -68,6 +77,7 @@
       self.stableCounter = 0;
           break;
   }
+
 //    if (self.onRectangleDetect) {
 //        self.onRectangleDetect(@{@"stableCounter": @(self.stableCounter), @"lastDetectionType": @(type)});
 //    }
@@ -83,8 +93,11 @@
   printf("on picture taken");
 }
 
-- (void) capture {
+- (void)setAutoCaptureEnabled:(BOOL)enabled {
+  _autoCaptureEnabled = enabled;
+}
 
+- (void) capture {
   [self captureImageWithCompletionHander:^(UIImage *croppedImage, UIImage *initialImage, CIRectangleFeature *rectangleFeature) {
 //      if (self.onPictureTaken) {
       NSData *croppedImageData = UIImageJPEGRepresentation(croppedImage, self.quality);
@@ -96,6 +109,7 @@
         initialImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
       }
+
       NSData *initialImageData = UIImageJPEGRepresentation(initialImage, self.quality);
 
       /*
@@ -109,8 +123,8 @@
               @"bottomLeft": @{ @"y": @(rectangleFeature.bottomRight.x), @"x": @(rectangleFeature.bottomRight.y)},
               @"bottomRight": @{ @"y": @(rectangleFeature.topRight.x), @"x": @(rectangleFeature.topRight.y)},
       } : [NSNull null];
-      if (self.useBase64) {
 
+      if (self.useBase64) {
         dispatch_async(dispatch_get_main_queue(), ^{
             printf("calling flutter onPictureTaken base64");
             [self->_flutterChannel invokeMethod:@"onPictureTaken" arguments:@{
@@ -138,28 +152,15 @@
 
 
         dispatch_async(dispatch_get_main_queue(), ^{
-
             printf("calling flutter onPictureTaken file");
-//                    NSLog(croppedFilePath);
-//                    NSLog(initialFilePath);
-//                    NSLog(rectangleCoordinates);
-
             [self->_flutterChannel invokeMethod:@"onPictureTaken" arguments:@{
                     @"croppedImage": croppedFilePath,
                     @"initialImage": initialFilePath,
                     @"rectangleCoordinates": rectangleCoordinates
 
             }];
-
         });
-
-
-//                self.onPictureTaken(@{
-//                                     @"croppedImage": croppedFilePath,
-//                                     @"initialImage": initialFilePath,
-//                                     @"rectangleCoordinates": rectangleCoordinates });
       }
-//        }
 
       if (!self.captureMultiple) {
         [self stop];

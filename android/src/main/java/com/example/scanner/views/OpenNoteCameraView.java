@@ -127,6 +127,7 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
 
     private OnScannerListener listener = null;
     private OnProcessingListener processingListener = null;
+    private OnRectangleDetectedListener onRectangleDetectedListener = null;
 
     public interface OnScannerListener {
         void onPictureTaken(Map path);
@@ -134,6 +135,10 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
 
     public interface OnProcessingListener {
         void onProcessingChange(Map path);
+    }
+
+    public interface OnRectangleDetectedListener {
+        void onRectangleDetected(boolean isDetected);
     }
 
     public void setOnScannerListener(OnScannerListener listener) {
@@ -146,6 +151,10 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
 
     public void setOnProcessingListener(OnProcessingListener processingListener) {
         this.processingListener = processingListener;
+    }
+
+    public void setOnRectangleDetectedListener(OnRectangleDetectedListener onRectangleDetectedListener) {
+        this.onRectangleDetectedListener = onRectangleDetectedListener;
     }
 
     public void removeOnProcessingListener() {
@@ -505,7 +514,6 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-
         Size pictureSize = camera.getParameters().getPreviewSize();
 
         if (mFocused && !imageProcessorBusy) {
@@ -610,6 +618,12 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
             return true;
         }
         return false;
+    }
+
+    public void rectangleDetected(boolean isDetected) {
+        if (onRectangleDetectedListener != null) {
+            mThis.onRectangleDetectedListener.onRectangleDetected(isDetected);
+        }
     }
 
     public boolean requestPicture() {

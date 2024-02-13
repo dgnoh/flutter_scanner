@@ -3,7 +3,7 @@
 # Run 'pod lib lint flutter_card_scanner.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'flutter_card_scanner'
+  s.name             = 'scanner'
   s.version          = '1.0.4'
   s.summary          = 'A new Flutter project.'
   s.description      = 'fluter card scanner'

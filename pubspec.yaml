@@ -1,4 +1,4 @@
-name: flutter_card_scanner
+name: scanner
 description: Our Scan Card feature is a powerful tool that enables users to effortlessly capture and digitize physical cards, such as business cards, identification cards, and more, by using their device's camera. This feature simplifies the process of storing and managing important card information in a digital format.
 version: 1.0.4
 homepage: https://github.com/ql920123/flutter_scanner

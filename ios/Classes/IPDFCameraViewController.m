@@ -33,6 +33,8 @@
   NSTimer *_borderDetectTimeKeeper;
   BOOL _borderDetectFrame;
   CIRectangleFeature *_borderDetectLastRectangleFeature;
+
+  BOOL _isFlutterDetected;
 }
 
 - (void)awakeFromNib
@@ -43,6 +45,24 @@
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_foregroundMode) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
+
+- (void)calculateAndStoreDesignatedArea {
+  // 지정된 영역의 꼭지점
+  CGPoint topLeft = CGPointMake(139.830567, 1393.790703);
+  CGPoint topRight = CGPointMake(948.663597, 1388.876381);
+  CGPoint bottomLeft = CGPointMake(116.323481, 884.929905);
+  CGPoint bottomRight = CGPointMake(985.367417, 887.165165);
+
+  // 지정된 영역의 최소 및 최대 좌표 계산 (여기서는 +-10을 미리 적용)
+  CGFloat minX = fmin(topLeft.x, bottomLeft.x);
+  CGFloat minY = fmin(topLeft.y, topRight.y);
+  CGFloat maxX = fmax(topRight.x, bottomRight.x);
+  CGFloat maxY = fmax(bottomLeft.y, bottomRight.y);
+
+  // 지정된 영역을 나타내는 CGRect 저장
+  self.designatedArea = CGRectMake(minX, minY, maxX - minX, maxY - minY);
+}
+
 
 - (void)_backgroundMode
 {
@@ -86,9 +106,14 @@
 - (void)setupCameraView
 {
 
+  // 지정 영역 계산 및 저장
+  [self calculateAndStoreDesignatedArea];
 
 //    NSLog(@"contrast in camera view : %f",self.);
   [self createGLKView];
+
+
+  _isFlutterDetected = false;
 
   AVCaptureDevice *device = nil;
   NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
@@ -114,7 +139,7 @@
 
   NSError *error = nil;
   AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-  session.sessionPreset = AVCaptureSessionPresetPhoto;
+  session.sessionPreset = AVCaptureSessionPresetHigh;
   [session addInput:input];
 
   AVCaptureVideoDataOutput *dataOutput = [[AVCaptureVideoDataOutput alloc] init];
@@ -191,7 +216,6 @@
     if (_borderDetectLastRectangleFeature)
     {
       self.imageDetectionConfidence += .5;
-
       image = [self drawHighlightOverlayForPoints:image topLeft:_borderDetectLastRectangleFeature.topLeft topRight:_borderDetectLastRectangleFeature.topRight bottomLeft:_borderDetectLastRectangleFeature.bottomLeft bottomRight:_borderDetectLastRectangleFeature.bottomRight];
     }
     else
@@ -216,6 +240,13 @@
 
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
+//
+// 꼭지점 좌표 로그 출력
+//  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
+//  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
+//  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
+//  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+
   CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
   overlay = [overlay imageByCroppingToRect:image.extent];
   overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
@@ -347,7 +378,6 @@
 
 - (void)captureImageWithCompletionHander:(void(^)(UIImage *data, UIImage *initialData, CIRectangleFeature *rectangleFeature))completionHandler;
 {
-
   if (self.isCapturing) return;
   self.isCapturing = true;
 
@@ -360,7 +390,6 @@
           [weakSelf hideGLKView:YES completion:nil];
       }];
   }];
-
   AVCaptureConnection *videoConnection = nil;
   for (AVCaptureConnection *connection in self.stillImageOutput.connections)
   {
@@ -374,7 +403,6 @@
     }
     if (videoConnection) break;
   }
-
   [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error)
   {
       NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
@@ -422,7 +450,6 @@
         UIImage *initialImage = [UIImage imageWithData:imageData];
         completionHandler(initialImage, initialImage, nil);
       }
-
       weakSelf.isCapturing = NO;
   }];
 }
@@ -516,6 +543,7 @@
     }
   }
 
+
   if (self.delegate) {
     [self.delegate didDetectRectangle:biggestRectangle withType:[self typeForRectangle:biggestRectangle]];
   }
@@ -524,6 +552,33 @@
 }
 
 - (IPDFRectangeType) typeForRectangle: (CIRectangleFeature*) rectangle {
+  BOOL isWithinDesignatedArea = CGRectContainsPoint(self.designatedArea, rectangle.topLeft) &&
+                                CGRectContainsPoint(self.designatedArea, rectangle.topRight) &&
+                                CGRectContainsPoint(self.designatedArea, rectangle.bottomLeft) &&
+                                CGRectContainsPoint(self.designatedArea, rectangle.bottomRight);
+
+  if (!isWithinDesignatedArea) {
+    if (_isFlutterDetected) {
+      // 감지 중
+      // 감지 정지
+      _isFlutterDetected = false;
+      [self.delegate onRectangleDetect:_isFlutterDetected];
+    } else {
+     // 이미 감지 정지
+    }
+    return IPDFRectangeTypeBadAngle;
+  } else {
+    // 영역안에 들어옴
+    if (_isFlutterDetected) {
+      // 감지 중이었음
+    } else {
+      // 감지 중이 아니었음
+      // 감지 중으로 변경
+      _isFlutterDetected = true;
+      [self.delegate onRectangleDetect:_isFlutterDetected];
+    }
+  }
+
   if (fabs(rectangle.topRight.y - rectangle.topLeft.y) > 100 ||
       fabs(rectangle.topRight.x - rectangle.bottomRight.x) > 100 ||
       fabs(rectangle.topLeft.x - rectangle.bottomLeft.x) > 100 ||

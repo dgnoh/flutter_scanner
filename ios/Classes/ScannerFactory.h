@@ -5,12 +5,12 @@
 - (instancetype)initWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar;
 @end
 
-
 @interface ScannerController : NSObject <FlutterPlatformView>
-@property(strong, nonatomic) ScannerView *scannerView;
-
+@property (strong, nonatomic) ScannerView *scannerView;
 - (instancetype)initWithFrame:(CGRect)frame
                viewIdentifier:(int64_t)viewId
                     arguments:(id _Nullable)args
-                    registrar:(NSObject <FlutterPluginRegistrar> *)registrar;
+                    registrar:(NSObject<FlutterPluginRegistrar>*)registrar;
+
+- (void)setAutoCaptureEnabled:(BOOL)enabled;
 @end

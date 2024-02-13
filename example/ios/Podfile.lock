@@ -2,7 +2,7 @@ PODS:
   - Flutter (1.0.0)
   - permission_handler_apple (9.1.1):
     - Flutter
-  - scanner (0.0.1):
+  - scanner (1.0.4):
     - Flutter
 
 DEPENDENCIES:
@@ -21,8 +21,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
-  scanner: d7d3769b938de1a15d043d5720db8eb9246e82bf
+  scanner: fec4fe50fc2e5780a84c3974029392d8f7731d9c
 
-PODFILE CHECKSUM: 02caaa843f6501172c0d470d80e72f61175c8b93
+PODFILE CHECKSUM: 959aa979c8241bd06f14c8e5946ae2883f901682
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.15.0

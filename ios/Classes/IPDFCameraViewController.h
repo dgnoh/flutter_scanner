@@ -17,6 +17,7 @@ IPDFRectangeTypeTooFar
 @protocol IPDFCameraViewControllerDelegate <NSObject>
 
 - (void)didDetectRectangle:(CIRectangleFeature *)rectangle withType:(IPDFRectangeType)type;
+-(void) onRectangleDetect:(BOOL)isDetected;
 
 @end
 
@@ -46,6 +47,11 @@ IPDFRectangeTypeTooFar
 @property(nonatomic, assign) float contrast;
 @property(nonatomic, assign) float brightness;
 @property(nonatomic, assign) NSInteger detectionRefreshRateInMS;
+@property (nonatomic, assign) BOOL autoCaptureEnabled; // 자동 촬영 활성화 프로퍼티 추가
+@property (assign, nonatomic) CGRect designatedArea;
+- (void)calculateAndStoreDesignatedArea;
+
+
 
 
 @end

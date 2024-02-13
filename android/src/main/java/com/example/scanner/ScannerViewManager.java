@@ -13,12 +13,16 @@ import com.example.scanner.views.OpenNoteCameraView;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
+import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.platform.PlatformView;
+import com.example.scanner.helpers.AppGlobals;
 
-public class ScannerViewManager implements PlatformView {
+
+public class ScannerViewManager implements PlatformView, MethodCallHandler {
 
 
     private MainView view = null;
@@ -37,6 +41,8 @@ public class ScannerViewManager implements PlatformView {
         this.activity = activity;
         this.params = params;
         this.channel = channel;
+
+        this.channel.setMethodCallHandler(this);
     }
 
 
@@ -54,7 +60,39 @@ public class ScannerViewManager implements PlatformView {
 
     }
 
+    @Override
+    public void onMethodCall(MethodCall call, Result result) {
+        switch (call.method) {
+            case "setAutoCaptureEnabled":
+                boolean enableAutoCapture = call.argument("enableAutoCapture");
+                System.out.println("ScannerViewManager setAutoCaptureEnabled: " + enableAutoCapture);
+                AppGlobals.getInstance().setAutoCaptureEnabled(enableAutoCapture);
+                result.success(null); // Acknowledge the call was received.
+                break;
+            // Handle other method calls if necessary
+            default:
+                result.notImplemented(); // Method not found
+        }
+    }
+
     void setParams(){
+
+        view.setOnRectangleDetectedListener(new OpenNoteCameraView.OnRectangleDetectedListener() {
+            @Override
+            public void onRectangleDetected(boolean isDetected) {
+                Handler uiThreadHandler = new Handler(context.getMainLooper());
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> args = new HashMap<>();
+                        args.put("isDetected", isDetected);
+                        System.out.println("onRectangleDetected" + isDetected);
+                        channel.invokeMethod("onRectangleDetected", args);
+                    }
+                };
+                uiThreadHandler.postAtFrontOfQueue(runnable);
+            }
+        });
         view.setOnProcessingListener(new OpenNoteCameraView.OnProcessingListener() {
 
             @Override
@@ -64,7 +102,7 @@ public class ScannerViewManager implements PlatformView {
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
-
+                        System.out.println("onProcessingChange onPictureTaken");
                         channel.invokeMethod("onPictureTaken",data);
                     }
                 };
@@ -81,7 +119,7 @@ public class ScannerViewManager implements PlatformView {
                  Runnable runnable = new Runnable() {
                      @Override
                      public void run() {
-                        
+                         System.out.println("setOnScannerListener onPictureTaken");
                        channel.invokeMethod("onPictureTaken",data);
                      }
                  };

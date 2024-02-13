@@ -4,11 +4,11 @@
 @implementation ScannerPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
-      methodChannelWithName:@"scanner"
+      methodChannelWithName:@"io.dkargo.lodis/scanner"
             binaryMessenger:[registrar messenger]];
   ScannerPlugin* instance = [[ScannerPlugin alloc] init];
   ScannerFactory* factory = [[ScannerFactory alloc] initWithRegistrar:registrar];
-  [registrar registerViewFactory:factory withId:@"scanner"];
+  [registrar registerViewFactory:factory withId:@"io.dkargo.lodis/scanner"];
 //  [registrar addMethodCallDelegate:instance channel:channel];
 }
 

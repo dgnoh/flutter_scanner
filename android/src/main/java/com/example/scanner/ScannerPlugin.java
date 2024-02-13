@@ -39,12 +39,12 @@ public class ScannerPlugin
     private Lifecycle lifecycle;
     static MethodChannel methodChannel;
 
-    private static final String VIEW_TYPE = "scanner";
+    private static final String VIEW_TYPE = "io.dkargo.lodis/scanner";
 
 
     public static void registerWith(Registrar registrar) {
 
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "scanner");
+        final MethodChannel channel = new MethodChannel(registrar.messenger(), "io.dkargo.lodis/scanner");
         channel.setMethodCallHandler(new com.example.scanner.ScannerPlugin());
         methodChannel = channel;
         if (registrar.activity() == null) {
@@ -70,7 +70,7 @@ public class ScannerPlugin
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
 
-        final MethodChannel channel = new MethodChannel(binding.getFlutterEngine().getDartExecutor(), "scanner");
+        final MethodChannel channel = new MethodChannel(binding.getFlutterEngine().getDartExecutor(), "io.dkargo.lodis/scanner");
         channel.setMethodCallHandler(new com.example.scanner.ScannerPlugin());
 
         methodChannel = channel;

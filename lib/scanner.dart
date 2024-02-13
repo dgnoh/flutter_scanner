@@ -5,19 +5,27 @@ import 'scanner_image.dart';
 
 import 'scanner_platform_interface.dart';
 
-const String _methodChannelIdentifier = 'scanner';
+// const String _methodChannelIdentifier = 'scanner';
+const String _methodChannelIdentifier = 'io.dkargo.lodis/scanner';
 
 class Scanner extends StatefulWidget{
   final Function(ScannedImage) onDocumentScanned;
+  final Function(bool) onRectangleDetected;
   final bool noGrayScale;
   const Scanner({super.key,
     required this.onDocumentScanned,
+    required this.onRectangleDetected,
     this.noGrayScale = true,
   });
   Future<String?> getPlatformVersion() {
     return ScannerPlatform.instance.getPlatformVersion();
   }
   final MethodChannel _channel = const MethodChannel(_methodChannelIdentifier);
+
+  Future<void> setCaptureEnabled(bool enabled) async {
+    await _channel.invokeMethod('setAutoCaptureEnabled', {'enableAutoCapture': enabled});
+  }
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -56,12 +64,17 @@ class _ScannerState extends State<Scanner> {
 
   Future<dynamic> _onDocumentScanned(MethodCall call) async {
     if (call.method == "onPictureTaken") {
+      print("onPictureTaken flutter");
       Map<String, dynamic> argsAsMap =
       Map<String, dynamic>.from(call.arguments);
       ScannedImage scannedImage = ScannedImage.fromMap(argsAsMap);
       if (scannedImage.croppedImage != null) {
         widget.onDocumentScanned(scannedImage);
       }
+    } else if (call.method == "onRectangleDetected") {
+      print("Rectangle detected");
+      bool isDetected = call.arguments['isDetected'];
+      widget.onRectangleDetected(isDetected);
     }
 
     return;

@@ -79,94 +79,58 @@
 
 @end
 
-@implementation ScannerController{
-
+@implementation ScannerController {
   int64_t _viewId;
   FlutterMethodChannel* _channel;
   BOOL _trackCameraPosition;
   NSObject<FlutterPluginRegistrar>* _registrar;
   BOOL _cameraDidInitialSetup;
-
+  ScannerView* _scannerView;
 }
+
 - (instancetype)initWithFrame:(CGRect)frame
                viewIdentifier:(int64_t)viewId
                     arguments:(id _Nullable)args
                     registrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  if (self = [super init]) {
+  self = [super init];
+  if (self) {
     _viewId = viewId;
-
+    _registrar = registrar;
     _trackCameraPosition = NO;
-//    InterpretMapOptions(args[@"options"], self);
-    NSString* channelName =
-            [NSString stringWithFormat:@"scanner"];
-    _channel = [FlutterMethodChannel methodChannelWithName:channelName
-                                           binaryMessenger:registrar.messenger];
+    // 사용하는 viewId를 문자열로 포함시킵니다. 여기서는 예시로 %lld를 사용합니다. 실제 타입에 맞게 조정이 필요할 수 있습니다.
+    NSString *channelName = @"io.dkargo.lodis/scanner";
+    _channel = [FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:[registrar messenger]];
 
-
-
-//      _scannerView = [DocumentScannerView new];
     _scannerView = [[ScannerView alloc] initWithChannel:_channel];
-
     __weak __typeof__(self) weakSelf = self;
-    [_channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
-        if (weakSelf) {
-//        [weakSelf onMethodCall:call result:result];
+    [_channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+        if ([@"setAutoCaptureEnabled" isEqualToString:call.method]) {
+          NSNumber *enabled = call.arguments[@"enableAutoCapture"];
+          NSLog(@"setAutoCaptureEnabled: %d", [enabled boolValue]);
+          [weakSelf setAutoCaptureEnabled:[enabled boolValue]];
+          result(nil);
+        } else {
+          result(FlutterMethodNotImplemented);
         }
     }];
-//    _mapView.delegate = weakSelf;
-    _registrar = registrar;
+
     _cameraDidInitialSetup = NO;
 
-    float channelBrightness = 0;
-    float channelContrast = 0;
-
-    id brightness = args[@"brightness"];
-    if ([brightness isKindOfClass:[NSNumber class]]){
-      channelBrightness = [brightness floatValue];
-
-    }else{
-      channelBrightness = 5;
-    }
-    id contrast = args[@"contrast"];
-    if ([contrast isKindOfClass:[NSNumber class]]){
-      channelContrast = [contrast floatValue];
-    }else{
-      channelContrast = 1.3;
-    }
-
-
-//            _scannerView = [[DocumentScannerView alloc] initWithChannel:_channel brightness:channelBrightness contrast:channelContrast];
-
-    //    id polygonsToAdd = args[@"polygonsToAdd"];
-//    if ([polygonsToAdd isKindOfClass:[NSArray class]]) {
-////      [_polygonsController addPolygons:polygonsToAdd];
-//    }
-//    id polylinesToAdd = args[@"polylinesToAdd"];
-//    if ([polylinesToAdd isKindOfClass:[NSArray class]]) {
-////      [_polylinesController addPolylines:polylinesToAdd];
-//    }
-//    id circlesToAdd = args[@"circlesToAdd"];
-//    if ([circlesToAdd isKindOfClass:[NSArray class]]) {
-////      [_circlesController addCircles:circlesToAdd];
-//    }
+    float channelBrightness = [args[@"brightness"] floatValue] ?: 5.0;
+    float channelContrast = [args[@"contrast"] floatValue] ?: 1.3;
   }
-
   return self;
 }
 
-- (dispatch_queue_t)methodQueue
-{
-  return dispatch_get_main_queue();
-}
-
-
-- (nonnull UIView *)view {
-
+- (UIView *)view {
   return _scannerView;
 }
 
+// ScannerView에 자동 캡처 활성화/비활성화 설정
+- (void)setAutoCaptureEnabled:(BOOL)enabled {
+  NSLog(@"setAutoCaptureEnabled2");
+  [_scannerView setAutoCaptureEnabled:enabled];
+}
+
 @end
-
-
-
 

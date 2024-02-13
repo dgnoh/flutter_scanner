@@ -55,6 +55,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.scanner.helpers.AppGlobals;
+
 /**
  * Created by allgood on 05/03/16.
  */
@@ -75,6 +77,8 @@ public class ImageProcessor extends Handler {
     private int numOfSquares = 0;
     private int numOfRectangles = 10;
     private boolean noGrayscale;
+
+    private boolean isFlutterDetected = false;
 
     public ImageProcessor(Looper looper, Handler uiHandler, OpenNoteCameraView mainActivity, Context context) {
         super(looper);
@@ -154,12 +158,14 @@ public class ImageProcessor extends Handler {
         boolean autoMode = previewFrame.isAutoMode();
         boolean previewOnly = previewFrame.isPreviewOnly();
         boolean focused = mMainActivity.isFocused();
+        boolean isAutoCaptureEnabled = AppGlobals.getInstance().isAutoCaptureEnabled();
+        System.out.println("onPreviewFrame" + isAutoCaptureEnabled);
 
-        if (detectPreviewDocument(frame) && focused) {
+        if (detectPreviewDocument(frame) && focused && isAutoCaptureEnabled) {
             numOfSquares++;
             if (numOfSquares == numOfRectangles) {
                 mMainActivity.requestPicture();
-                mMainActivity.waitSpinnerVisible();
+//                mMainActivity.waitSpinnerVisible();
                 numOfSquares = 0;
             }
         } else {
@@ -245,7 +251,6 @@ public class ImageProcessor extends Handler {
     }
 
     private boolean detectPreviewDocument(Mat inputRgba) {
-
         ArrayList<MatOfPoint> contours = findContours(inputRgba);
 
         Quadrilateral quad = getQuadrilateral(contours, inputRgba.size());
@@ -255,7 +260,20 @@ public class ImageProcessor extends Handler {
         mPreviewPoints = null;
         mPreviewSize = inputRgba.size();
 
+        Point[] areaQuad = {
+                new Point(358.0, 0.0), // 좌상단
+                new Point(694.0, 0.0), // 우상단
+                new Point(684.0, 498.0), // 우하단
+                new Point(354.0, 489.0) // 좌하단
+        };
+
         if (quad != null) {
+
+            boolean isInside = isQuadInsideArea(quad.points, areaQuad);
+            for (int i = 0; i < quad.points.length; i++) {
+                // Quad 포인트 로그 출력
+                System.out.println("Quad Point " + i + ": (" + quad.points[i].x + ", " + quad.points[i].y + ")");
+            }
 
             Point[] rescaledPoints = new Point[4];
 
@@ -275,9 +293,20 @@ public class ImageProcessor extends Handler {
             mPreviewPoints = rescaledPoints;
 
             drawDocumentBox(mPreviewPoints, mPreviewSize);
+            System.out.println("isInside " + isInside);
+            if (isInside) {
+                if (!isFlutterDetected) {
+                    isFlutterDetected = true;
+                    mMainActivity.rectangleDetected(isFlutterDetected);
+                }
 
-            return true;
-
+                return true;
+            } else {
+                if (isFlutterDetected) {
+                    isFlutterDetected = false;
+                    mMainActivity.rectangleDetected(isFlutterDetected);
+                }
+            }
         }
 
         mMainActivity.getHUD().clear();
@@ -287,6 +316,22 @@ public class ImageProcessor extends Handler {
 
     }
 
+    public boolean isQuadInsideArea(Point[] quadPoints, Point[] areaQuad) {
+        // areaQuad는 (좌상단, 우상단, 우하단, 좌하단) 순으로 되어있어야 함
+        Point topLeft = areaQuad[0];
+        Point bottomRight = areaQuad[2];
+
+        // 주어진 모든 점이 사각형 영역 내부에 있는지 확인
+        for (Point quadPoint : quadPoints) {
+            if (!(quadPoint.x >= topLeft.x && quadPoint.x <= bottomRight.x &&
+                    quadPoint.y >= topLeft.y && quadPoint.y <= bottomRight.y)) {
+                // 하나라도 영역 밖에 있는 경우
+                return false;
+            }
+        }
+        // 모든 점이 영역 내부에 있는 경우
+        return true;
+    }
     private void drawDocumentBox(Point[] points, Size stdSize) {
 
         Path path = new Path();

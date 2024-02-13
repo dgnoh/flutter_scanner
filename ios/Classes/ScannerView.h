@@ -13,6 +13,7 @@
 @property (nonatomic, assign) BOOL useBase64;
 @property (nonatomic, assign) BOOL captureMultiple;
 @property (nonatomic, assign) BOOL saveInAppDocument;
+@property (nonatomic) BOOL autoCaptureEnabled;
 @property (nonatomic, assign) FlutterMethodChannel* flutterChannel;
 
 -(instancetype) init : (float)channelBrightness contrast: (float)channelContrast;
@@ -23,7 +24,8 @@
 
 - (void) capture ;
 - (void) onPictureTaken: (NSDictionary*) result;
-- (void) onRectangleDetect;
+-(void) onRectangleDetect:(BOOL)isDetected;
+- (void)setAutoCaptureEnabled:(BOOL)enabled;
 //- (void) setChannelBrightness:(float)brightness;
 //- (void) setChannelContrast:(float)contrast;
 

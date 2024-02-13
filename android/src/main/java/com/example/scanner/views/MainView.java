@@ -57,6 +57,10 @@ public class MainView extends FrameLayout {
         view.setOnScannerListener(listener);
     }
 
+    public void setOnRectangleDetectedListener(OpenNoteCameraView.OnRectangleDetectedListener listener) {
+        view.setOnRectangleDetectedListener(listener);
+    }
+
     public void removeOnScannerListener() {
         view.removeOnScannerListener();
     }

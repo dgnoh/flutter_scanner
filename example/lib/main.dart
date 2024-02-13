@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:scanner/scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scanner/scanner_image.dart';
+import 'package:scanner/scanner_method_channel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,10 +24,13 @@ class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   File? scannedDocument;
   Future<PermissionStatus>? cameraPermissionFuture;
+  MethodChannelScanner scannerChannel = MethodChannelScanner();
+  ValueNotifier<bool> isDetectedNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
+    requestCamera();
     cameraPermissionFuture = Permission.camera.request();
   }
 
@@ -39,7 +43,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Scanner app'),
+            title: const Text('Scanners app'),
           ),
           body: FutureBuilder<PermissionStatus>(
             future: requestCamera(),
@@ -67,27 +71,31 @@ class _MyAppState extends State<MyApp> {
                                 setState(() {
                                   scannedDocument = scannedImage
                                       .getScannedDocumentAsFile();
-                                  // imageLocation = image;
                                 });
+                              },
+                              onRectangleDetected: (bool isDetected) {
+                                print("isDetected : " + isDetected.toString());
+                                isDetectedNotifier.value = isDetected;
                               },
                             ),
                           ),
                         ],
                       ),
-                      scannedDocument != null
-                          ? Positioned(
-                        bottom: 20,
-                        left: 0,
-                        right: 0,
-                        child: ElevatedButton(
-                            child: Text("retry"),
-                            onPressed: () {
-                              setState(() {
-                                scannedDocument = null;
-                              });
-                            }),
-                      )
-                          : Container(),
+                     ValueListenableBuilder(valueListenable: isDetectedNotifier, builder: (contet, isDetected, child) {
+                       return  Positioned(
+                           top: 200,
+                           child: Container(
+                             width: MediaQuery.of(context).size.width, // 앱의 전체 너비로 설정
+                             height: 200, // 원하는 높이
+                             decoration: BoxDecoration(
+                               color: Colors.transparent, // 배경을 투명하게 설정
+                               border: Border.all(
+                                 color: isDetected ? Colors.blue : Colors.red, // 테두리 색상을 빨간색으로 설정
+                                 width: 2, // 테두리 두께 설정
+                               ),
+                             ),
+                           ));
+                     })
                     ],
                   );
                 } else {
@@ -102,7 +110,14 @@ class _MyAppState extends State<MyApp> {
                 );
               }
             },
-          )),
+          ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // await scannerChannel.getPlatformVersion();
+          await scannerChannel.setCaptureEnabled(false);
+        },
+        child: const Icon(Icons.camera_alt),
+      ),),
     );
   }
 }
