@@ -159,7 +159,6 @@ public class ImageProcessor extends Handler {
         boolean previewOnly = previewFrame.isPreviewOnly();
         boolean focused = mMainActivity.isFocused();
         boolean isAutoCaptureEnabled = AppGlobals.getInstance().isAutoCaptureEnabled();
-        System.out.println("onPreviewFrame" + isAutoCaptureEnabled);
 
         if (detectPreviewDocument(frame) && focused && isAutoCaptureEnabled) {
             numOfSquares++;
@@ -292,7 +291,7 @@ public class ImageProcessor extends Handler {
 
             mPreviewPoints = rescaledPoints;
 
-            drawDocumentBox(mPreviewPoints, mPreviewSize);
+//            drawDocumentBox(mPreviewPoints, mPreviewSize);
             System.out.println("isInside " + isInside);
             if (isInside) {
                 if (!isFlutterDetected) {
@@ -307,6 +306,11 @@ public class ImageProcessor extends Handler {
                     mMainActivity.rectangleDetected(isFlutterDetected);
                 }
             }
+        } else {
+            if (isFlutterDetected) {
+                isFlutterDetected = false;
+                mMainActivity.rectangleDetected(isFlutterDetected);
+            }
         }
 
         mMainActivity.getHUD().clear();
@@ -317,9 +321,15 @@ public class ImageProcessor extends Handler {
     }
 
     public boolean isQuadInsideArea(Point[] quadPoints, Point[] areaQuad) {
-        // areaQuad는 (좌상단, 우상단, 우하단, 좌하단) 순으로 되어있어야 함
         Point topLeft = areaQuad[0];
         Point bottomRight = areaQuad[2];
+
+        double width = Math.sqrt(Math.pow(quadPoints[1].x - quadPoints[0].x, 2) + Math.pow(quadPoints[1].y - quadPoints[0].y, 2));
+        double height = Math.sqrt(Math.pow(quadPoints[3].x - quadPoints[0].x, 2) + Math.pow(quadPoints[3].y - quadPoints[0].y, 2));
+
+        if (width < 200 || height < 320) {
+            return false;
+        }
 
         // 주어진 모든 점이 사각형 영역 내부에 있는지 확인
         for (Point quadPoint : quadPoints) {

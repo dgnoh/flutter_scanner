@@ -109,7 +109,11 @@
           NSLog(@"setAutoCaptureEnabled: %d", [enabled boolValue]);
           [weakSelf setAutoCaptureEnabled:[enabled boolValue]];
           result(nil);
-        } else {
+        }
+        else if ([@"isNativeReady" isEqualToString:call.method]) {
+            result(@"true");
+        }
+        else {
           result(FlutterMethodNotImplemented);
         }
     }];

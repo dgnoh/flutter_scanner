@@ -27,7 +27,7 @@
 
 
   if (self) {
-    _autoCaptureEnabled = true;
+    _autoCaptureEnabled = false;
     [self setEnableBorderDetection:YES];
     [self setDelegate: self];
   }

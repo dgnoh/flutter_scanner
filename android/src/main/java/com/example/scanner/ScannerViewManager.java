@@ -69,6 +69,10 @@ public class ScannerViewManager implements PlatformView, MethodCallHandler {
                 AppGlobals.getInstance().setAutoCaptureEnabled(enableAutoCapture);
                 result.success(null); // Acknowledge the call was received.
                 break;
+
+            case "isNativeReady":
+                result.success("true");
+                break;
             // Handle other method calls if necessary
             default:
                 result.notImplemented(); // Method not found
@@ -102,7 +106,6 @@ public class ScannerViewManager implements PlatformView, MethodCallHandler {
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("onProcessingChange onPictureTaken");
                         channel.invokeMethod("onPictureTaken",data);
                     }
                 };
@@ -119,7 +122,6 @@ public class ScannerViewManager implements PlatformView, MethodCallHandler {
                  Runnable runnable = new Runnable() {
                      @Override
                      public void run() {
-                         System.out.println("setOnScannerListener onPictureTaken");
                        channel.invokeMethod("onPictureTaken",data);
                      }
                  };

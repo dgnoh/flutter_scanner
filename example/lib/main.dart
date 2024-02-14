@@ -26,12 +26,30 @@ class _MyAppState extends State<MyApp> {
   Future<PermissionStatus>? cameraPermissionFuture;
   MethodChannelScanner scannerChannel = MethodChannelScanner();
   ValueNotifier<bool> isDetectedNotifier = ValueNotifier<bool>(false);
+  Timer? _timer;
+
+  void startTimer() {
+    const interval = const Duration(milliseconds: 500);
+    _timer = Timer.periodic(interval, (timer) async {
+      // 여기에 반복적으로 실행할 코드를 작성합니다.
+      var result = await scannerChannel.isScannerReady();
+
+      // 만약 result가 원하는 값이라면 Timer를 종료합니다.
+      if (result != null) {
+        scannerChannel.setCaptureEnabled(true);
+        timer.cancel();
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     requestCamera();
     cameraPermissionFuture = Permission.camera.request();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      startTimer();
+    });
   }
 
   Future<PermissionStatus> requestCamera() async{
@@ -68,10 +86,10 @@ class _MyAppState extends State<MyApp> {
                                 print("document : " +
                                     scannedImage.croppedImage!);
 
-                                setState(() {
-                                  scannedDocument = scannedImage
-                                      .getScannedDocumentAsFile();
-                                });
+                                // setState(() {
+                                //   scannedDocument = scannedImage
+                                //       .getScannedDocumentAsFile();
+                                // });
                               },
                               onRectangleDetected: (bool isDetected) {
                                 print("isDetected : " + isDetected.toString());

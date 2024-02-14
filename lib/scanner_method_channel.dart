@@ -10,30 +10,23 @@ class MethodChannelScanner extends ScannerPlatform {
   final methodChannel = const MethodChannel('io.dkargo.lodis/scanner');
 
   @override
-  Future<String?> getPlatformVersion() async {
+  Future<String?> isScannerReady() async {
     try {
-      print('getPlatformVersion ');
-      final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-      print('version $version');
-      return version;
+      final isReady = await methodChannel.invokeMethod<String>('isNativeReady');
+      return isReady;
     } catch (e) {
-      print('Error fetching platform version: $e');
       return null;
     }
   }
 
   Future<void> setCaptureEnabled(bool enabled) async {
-    print('setCaptureEnabled: $enabled');
     try {
       await methodChannel.invokeMethod('setAutoCaptureEnabled', {'enableAutoCapture': enabled});
     } catch (e) {
-      print('Error setting capture enabled: $e');
     }
   }
 
    Future<void> disableAutoCapture() async {
-    print('disableAutoCapture');
     final version = await methodChannel.invokeMethod('disableAutoCapture');
-    print(version);
   }
 }

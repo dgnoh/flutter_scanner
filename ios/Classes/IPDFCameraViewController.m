@@ -47,19 +47,16 @@
 }
 
 - (void)calculateAndStoreDesignatedArea {
-  // 지정된 영역의 꼭지점
   CGPoint topLeft = CGPointMake(139.830567, 1393.790703);
   CGPoint topRight = CGPointMake(948.663597, 1388.876381);
   CGPoint bottomLeft = CGPointMake(116.323481, 884.929905);
   CGPoint bottomRight = CGPointMake(985.367417, 887.165165);
 
-  // 지정된 영역의 최소 및 최대 좌표 계산 (여기서는 +-10을 미리 적용)
   CGFloat minX = fmin(topLeft.x, bottomLeft.x);
   CGFloat minY = fmin(topLeft.y, topRight.y);
   CGFloat maxX = fmax(topRight.x, bottomRight.x);
   CGFloat maxY = fmax(bottomLeft.y, bottomRight.y);
 
-  // 지정된 영역을 나타내는 CGRect 저장
   self.designatedArea = CGRectMake(minX, minY, maxX - minX, maxY - minY);
 }
 
@@ -240,18 +237,19 @@
 
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
+  return image;
 //
 // 꼭지점 좌표 로그 출력
 //  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
 //  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
 //  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
 //  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
-
-  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
-  overlay = [overlay imageByCroppingToRect:image.extent];
-  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
-
-  return [overlay imageByCompositingOverImage:image];
+//
+//  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
+//  overlay = [overlay imageByCroppingToRect:image.extent];
+//  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
+//
+//  return [overlay imageByCompositingOverImage:image];
 }
 
 - (void)start
@@ -552,10 +550,14 @@
 }
 
 - (IPDFRectangeType) typeForRectangle: (CIRectangleFeature*) rectangle {
+  CGFloat width = sqrt(pow((rectangle.topRight.x - rectangle.topLeft.x), 2) + pow((rectangle.topRight.y - rectangle.topLeft.y), 2));
+  CGFloat height = sqrt(pow((rectangle.topLeft.x - rectangle.bottomLeft.x), 2) + pow((rectangle.topLeft.y - rectangle.bottomLeft.y), 2));
+
   BOOL isWithinDesignatedArea = CGRectContainsPoint(self.designatedArea, rectangle.topLeft) &&
                                 CGRectContainsPoint(self.designatedArea, rectangle.topRight) &&
                                 CGRectContainsPoint(self.designatedArea, rectangle.bottomLeft) &&
-                                CGRectContainsPoint(self.designatedArea, rectangle.bottomRight);
+                                CGRectContainsPoint(self.designatedArea, rectangle.bottomRight) &&
+                                width > 200 && height > 325;
 
   if (!isWithinDesignatedArea) {
     if (_isFlutterDetected) {

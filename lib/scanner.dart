@@ -5,7 +5,6 @@ import 'scanner_image.dart';
 
 import 'scanner_platform_interface.dart';
 
-// const String _methodChannelIdentifier = 'scanner';
 const String _methodChannelIdentifier = 'io.dkargo.lodis/scanner';
 
 class Scanner extends StatefulWidget{
@@ -28,7 +27,6 @@ class Scanner extends StatefulWidget{
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _ScannerState();
   }
 
