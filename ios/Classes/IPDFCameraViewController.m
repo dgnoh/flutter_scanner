@@ -47,10 +47,10 @@
 }
 
 - (void)calculateAndStoreDesignatedArea {
-  CGPoint topLeft = CGPointMake(139.830567, 1393.790703);
-  CGPoint topRight = CGPointMake(948.663597, 1388.876381);
-  CGPoint bottomLeft = CGPointMake(116.323481, 884.929905);
-  CGPoint bottomRight = CGPointMake(985.367417, 887.165165);
+  CGPoint topLeft = CGPointMake(88.662396, 1408.964882);
+  CGPoint topRight = CGPointMake(962.730775, 1420.060043);
+  CGPoint bottomLeft = CGPointMake(78.536633, 861.093464);
+  CGPoint bottomRight = CGPointMake(977.658813, 867.527618);
 
   CGFloat minX = fmin(topLeft.x, bottomLeft.x);
   CGFloat minY = fmin(topLeft.y, topRight.y);
@@ -237,13 +237,14 @@
 
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
-  return image;
-//
-// 꼭지점 좌표 로그 출력
+
 //  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
 //  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
 //  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
 //  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+  return image;
+//
+// 꼭지점 좌표 로그 출력
 //
 //  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
 //  overlay = [overlay imageByCroppingToRect:image.extent];
