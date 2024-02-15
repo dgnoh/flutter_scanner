@@ -47,10 +47,10 @@
 }
 
 - (void)calculateAndStoreDesignatedArea {
-  CGPoint topLeft = CGPointMake(88.662396, 1408.964882);
-  CGPoint topRight = CGPointMake(962.730775, 1420.060043);
-  CGPoint bottomLeft = CGPointMake(78.536633, 861.093464);
-  CGPoint bottomRight = CGPointMake(977.658813, 867.527618);
+  CGPoint topLeft = CGPointMake(19.857215, 1469.476433);
+  CGPoint topRight = CGPointMake(1051.678383,1478.913460);
+  CGPoint bottomLeft = CGPointMake(15.709789, 822.744141);
+  CGPoint bottomRight = CGPointMake(1062.530966, 837.252903);
 
   CGFloat minX = fmin(topLeft.x, bottomLeft.x);
   CGFloat minY = fmin(topLeft.y, topRight.y);
@@ -238,10 +238,10 @@
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
 
-//  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
-//  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
-//  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
-//  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
+  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
+  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
+  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
   return image;
 //
 // 꼭지점 좌표 로그 출력
