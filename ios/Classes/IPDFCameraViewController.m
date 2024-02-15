@@ -238,10 +238,10 @@
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
 
-  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
-  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
-  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
-  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+//  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
+//  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
+//  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
+//  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
   return image;
 //
 // 꼭지점 좌표 로그 출력
