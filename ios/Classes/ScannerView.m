@@ -51,8 +51,17 @@
 -(void) onRectangleDetect:(BOOL)isDetected {
   // Flutter에 isDetected 값을 전달
   dispatch_async(dispatch_get_main_queue(), ^{
-      printf("calling flutter onRectangleDetected");
-      [self->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
+      @try {
+        if (self->_flutterChannel) { // _flutterChannel이 nil이 아닌지 확인
+            [self->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
+        } else {
+            NSLog(@"_flutterChannel is nil, skipping method call");
+        }
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Exception occurred while calling Flutter: %@", exception);
+        // 여기서 필요한 추가 처리를 수행할 수 있습니다.
+    }
   });
 }
 

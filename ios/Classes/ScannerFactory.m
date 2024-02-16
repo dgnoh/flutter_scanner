@@ -136,5 +136,11 @@
   [_scannerView setAutoCaptureEnabled:enabled];
 }
 
+- (void)dealloc {
+    // FlutterMethodChannel의 메소드 콜 핸들러 해제
+    [_channel setMethodCallHandler:nil];
+    _scannerView = nil; // ScannerView 참조 해제
+}
+
 @end
 

@@ -47,10 +47,10 @@
 }
 
 - (void)calculateAndStoreDesignatedArea {
-  CGPoint topLeft = CGPointMake(19.857215, 1469.476433);
-  CGPoint topRight = CGPointMake(1051.678383,1478.913460);
-  CGPoint bottomLeft = CGPointMake(15.709789, 822.744141);
-  CGPoint bottomRight = CGPointMake(1062.530966, 837.252903);
+  CGPoint topLeft = CGPointMake(4.91, 1482.11);
+  CGPoint topRight = CGPointMake(1074.22, 1482.77);
+  CGPoint bottomLeft = CGPointMake(-16.47, 786.89);
+  CGPoint bottomRight = CGPointMake(1093.48, 788.20);
 
   CGFloat minX = fmin(topLeft.x, bottomLeft.x);
   CGFloat minY = fmin(topLeft.y, topRight.y);
@@ -238,19 +238,19 @@
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
 
-//  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
-//  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
-//  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
-//  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
-  return image;
+  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
+  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
+  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
+  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+//  return image;
 //
 // 꼭지점 좌표 로그 출력
-//
-//  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
-//  overlay = [overlay imageByCroppingToRect:image.extent];
-//  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
-//
-//  return [overlay imageByCompositingOverImage:image];
+
+  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
+  overlay = [overlay imageByCroppingToRect:image.extent];
+  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
+
+  return [overlay imageByCompositingOverImage:image];
 }
 
 - (void)start

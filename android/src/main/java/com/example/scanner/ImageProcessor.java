@@ -260,10 +260,10 @@ public class ImageProcessor extends Handler {
         mPreviewSize = inputRgba.size();
 
         Point[] areaQuad = {
-                new Point(358.0, 0.0), // 좌상단
-                new Point(694.0, 0.0), // 우상단
-                new Point(684.0, 498.0), // 우하단
-                new Point(354.0, 489.0) // 좌하단
+                new Point(188.0, 25.0), // 좌상단
+                new Point(479.0, 18.0), // 우상단
+                new Point(849.0, 472.0), // 우하단
+                new Point(558.0, 472.0) // 좌하단
         };
 
         if (quad != null) {
@@ -271,7 +271,7 @@ public class ImageProcessor extends Handler {
             boolean isInside = isQuadInsideArea(quad.points, areaQuad);
             for (int i = 0; i < quad.points.length; i++) {
                 // Quad 포인트 로그 출력
-//                System.out.println("Quad Point " + i + ": (" + quad.points[i].x + ", " + quad.points[i].y + ")");
+                System.out.println("Quad Point " + i + ": (" + quad.points[i].x + ", " + quad.points[i].y + ")");
             }
 
             Point[] rescaledPoints = new Point[4];
@@ -291,8 +291,7 @@ public class ImageProcessor extends Handler {
 
             mPreviewPoints = rescaledPoints;
 
-//            drawDocumentBox(mPreviewPoints, mPreviewSize);
-            System.out.println("isInside " + isInside);
+            drawDocumentBox(mPreviewPoints, mPreviewSize);
             if (isInside) {
                 if (!isFlutterDetected) {
                     isFlutterDetected = true;
