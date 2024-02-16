@@ -566,6 +566,7 @@
       // 감지 정지
       _isFlutterDetected = false;
       if (self.delegate){
+      NSLog(@"ERROR: Rectangle is not within the designated area");
        [self.delegate onRectangleDetect:_isFlutterDetected];
       }
     } else {
@@ -581,6 +582,7 @@
       // 감지 중으로 변경
       _isFlutterDetected = true;
       if (self.delegate) {
+          NSLog(@"ERROR: Rectangle is not within the designated area");
         [self.delegate onRectangleDetect:_isFlutterDetected];
       }
     }
