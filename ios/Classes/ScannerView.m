@@ -4,6 +4,7 @@
 @implementation ScannerView
 {
   BOOL _autoCaptureEnabled;
+  BOOL _isCaptureCompleted;
 }
 - (instancetype)init{
   self = [super init];
@@ -25,8 +26,8 @@
   self.contrast = 1.4;
   self.durationBetweenCaptures = 0;
 
-
   if (self) {
+    _isCaptureCompleted = false;
     _autoCaptureEnabled = false;
     [self setEnableBorderDetection:YES];
     [self setDelegate: self];
@@ -54,6 +55,10 @@
   dispatch_async(dispatch_get_main_queue(), ^{
       __strong typeof(weakSelf) strongSelf = weakSelf;  // 여기에 추가
       @try {
+          if (_isCaptureCompleted){
+              return;
+          }
+
         if (strongSelf && strongSelf->_flutterChannel) { // _flutterChannel이 nil이 아닌지 확인
             [strongSelf->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
         } else {
@@ -174,11 +179,11 @@
       }
 
       if (!self.captureMultiple) {
+        _isCaptureCompleted = true;
         [self stop];
       }
   }];
 
 }
-
 
 @end
