@@ -237,20 +237,20 @@
 
 - (CIImage *)drawHighlightOverlayForPoints:(CIImage *)image topLeft:(CGPoint)topLeft topRight:(CGPoint)topRight bottomLeft:(CGPoint)bottomLeft bottomRight:(CGPoint)bottomRight
 {
-
-  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
-  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
-  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
-  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
-//  return image;
+//
+//  NSLog(@"Top Left: (%f, %f)", topLeft.x, topLeft.y);
+//  NSLog(@"Top Right: (%f, %f)", topRight.x, topRight.y);
+//  NSLog(@"Bottom Left: (%f, %f)", bottomLeft.x, bottomLeft.y);
+//  NSLog(@"Bottom Right: (%f, %f)", bottomRight.x, bottomRight.y);
+  return image;
 //
 // 꼭지점 좌표 로그 출력
-
-  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
-  overlay = [overlay imageByCroppingToRect:image.extent];
-  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
-
-  return [overlay imageByCompositingOverImage:image];
+//
+//  CIImage *overlay = [CIImage imageWithColor:[[CIColor alloc] initWithColor:self.overlayColor]];
+//  overlay = [overlay imageByCroppingToRect:image.extent];
+//  overlay = [overlay imageByApplyingFilter:@"CIPerspectiveTransformWithExtent" withInputParameters:@{@"inputExtent":[CIVector vectorWithCGRect:image.extent],@"inputTopLeft":[CIVector vectorWithCGPoint:topLeft],@"inputTopRight":[CIVector vectorWithCGPoint:topRight],@"inputBottomLeft":[CIVector vectorWithCGPoint:bottomLeft],@"inputBottomRight":[CIVector vectorWithCGPoint:bottomRight]}];
+//
+//  return [overlay imageByCompositingOverImage:image];
 }
 
 - (void)start

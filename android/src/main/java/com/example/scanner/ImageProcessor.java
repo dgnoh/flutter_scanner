@@ -269,10 +269,10 @@ public class ImageProcessor extends Handler {
         if (quad != null) {
 
             boolean isInside = isQuadInsideArea(quad.points, areaQuad);
-            for (int i = 0; i < quad.points.length; i++) {
-                // Quad 포인트 로그 출력
-                System.out.println("Quad Point " + i + ": (" + quad.points[i].x + ", " + quad.points[i].y + ")");
-            }
+//            for (int i = 0; i < quad.points.length; i++) {
+//                // Quad 포인트 로그 출력
+//                System.out.println("Quad Point " + i + ": (" + quad.points[i].x + ", " + quad.points[i].y + ")");
+//            }
 
             Point[] rescaledPoints = new Point[4];
 
@@ -291,7 +291,7 @@ public class ImageProcessor extends Handler {
 
             mPreviewPoints = rescaledPoints;
 
-            drawDocumentBox(mPreviewPoints, mPreviewSize);
+//            drawDocumentBox(mPreviewPoints, mPreviewSize);
             if (isInside) {
                 if (!isFlutterDetected) {
                     isFlutterDetected = true;
