@@ -565,7 +565,9 @@
       // 감지 중
       // 감지 정지
       _isFlutterDetected = false;
-      [self.delegate onRectangleDetect:_isFlutterDetected];
+      if (self.delegate){
+       [self.delegate onRectangleDetect:_isFlutterDetected];
+      }
     } else {
      // 이미 감지 정지
     }
@@ -578,7 +580,9 @@
       // 감지 중이 아니었음
       // 감지 중으로 변경
       _isFlutterDetected = true;
-      [self.delegate onRectangleDetect:_isFlutterDetected];
+      if (self.delegate) {
+        [self.delegate onRectangleDetect:_isFlutterDetected];
+      }
     }
   }
 
