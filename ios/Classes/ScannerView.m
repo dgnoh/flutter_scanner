@@ -50,10 +50,12 @@
 
 -(void) onRectangleDetect:(BOOL)isDetected {
   // Flutter에 isDetected 값을 전달
+  __weak typeof(self) weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
+      __strong typeof(weakSelf) strongSelf = weakSelf;  // 여기에 추가
       @try {
-        if (self->_flutterChannel) { // _flutterChannel이 nil이 아닌지 확인
-            [self->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
+        if (strongSelf && strongSelf->_flutterChannel) { // _flutterChannel이 nil이 아닌지 확인
+            [strongSelf->_flutterChannel invokeMethod:@"onRectangleDetected" arguments:@{@"isDetected": @(isDetected)}];
         } else {
             NSLog(@"_flutterChannel is nil, skipping method call");
         }
