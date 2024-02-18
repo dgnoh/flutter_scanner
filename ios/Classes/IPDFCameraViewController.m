@@ -187,7 +187,7 @@
   CGRect rectangle = CGRectMake(20, 200, self.frame.size.width - 40, 200);
 
   // 둥근 모서리의 radius를 설정합니다.
-  CGFloat cornerRadius = 8.0;
+  CGFloat cornerRadius = 12.0;
 
   // 둥근 모서리가 적용된 사각형 경로를 생성합니다.
   UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rectangle cornerRadius:cornerRadius];
