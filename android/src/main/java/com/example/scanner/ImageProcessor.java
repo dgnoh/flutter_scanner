@@ -260,10 +260,10 @@ public class ImageProcessor extends Handler {
         mPreviewSize = inputRgba.size();
 
         Point[] areaQuad = {
-                new Point(188.0, 25.0), // 좌상단
-                new Point(479.0, 18.0), // 우상단
-                new Point(849.0, 472.0), // 우하단
-                new Point(558.0, 472.0) // 좌하단
+                new Point(188.0, 0.0), // 좌상단
+                new Point(849.0, 0.0), // 우상단
+                new Point(849.0, 500.0), // 우하단
+                new Point(188.0, 500.0) // 좌하단
         };
 
         if (quad != null) {

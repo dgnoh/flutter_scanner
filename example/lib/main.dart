@@ -27,6 +27,8 @@ class _MyAppState extends State<MyApp> {
   MethodChannelScanner scannerChannel = MethodChannelScanner();
   ValueNotifier<bool> isDetectedNotifier = ValueNotifier<bool>(false);
   Timer? _timer;
+  double? deviceWidth;
+  double? deviceHeight;
 
   void startTimer() {
     const interval = const Duration(milliseconds: 500);
@@ -60,8 +62,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Scanners app'),
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(50.0),
+            child: AppBar(
+              title: const Text('Scanners app'),
+            ),
           ),
           body: FutureBuilder<PermissionStatus>(
             future: requestCamera(),

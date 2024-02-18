@@ -49,6 +49,9 @@ IPDFRectangeTypeTooFar
 @property(nonatomic, assign) NSInteger detectionRefreshRateInMS;
 @property (nonatomic, assign) BOOL autoCaptureEnabled; // 자동 촬영 활성화 프로퍼티 추가
 @property (assign, nonatomic) CGRect designatedArea;
+@property (nonatomic, assign) CGFloat cameraWidth;
+@property (nonatomic, assign) CGFloat cameraHeight;
+@property (strong, nonatomic) CAShapeLayer *shapeLayer;
 - (void)calculateAndStoreDesignatedArea;
 
 

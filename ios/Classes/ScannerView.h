@@ -24,9 +24,7 @@
 
 - (void) capture ;
 - (void) onPictureTaken: (NSDictionary*) result;
--(void) onRectangleDetect:(BOOL)isDetected;
+- (void) onRectangleDetect:(BOOL)isDetected;
 - (void)setAutoCaptureEnabled:(BOOL)enabled;
-//- (void) setChannelBrightness:(float)brightness;
-//- (void) setChannelContrast:(float)contrast;
 
 @end

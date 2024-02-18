@@ -70,9 +70,10 @@ class _ScannerState extends State<Scanner> {
         widget.onDocumentScanned(scannedImage);
       }
     } else if (call.method == "onRectangleDetected") {
-      print("Rectangle detected");
-      bool isDetected = call.arguments['isDetected'];
-      widget.onRectangleDetected(isDetected);
+      if (Platform.isAndroid) {
+        bool isDetected = call.arguments['isDetected'];
+        widget.onRectangleDetected(isDetected);
+      }
     }
 
     return;

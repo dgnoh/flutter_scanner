@@ -45,20 +45,20 @@
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_foregroundMode) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
-
-- (void)calculateAndStoreDesignatedArea {
-  CGPoint topLeft = CGPointMake(4.91, 1482.11);
-  CGPoint topRight = CGPointMake(1074.22, 1482.77);
-  CGPoint bottomLeft = CGPointMake(-16.47, 786.89);
-  CGPoint bottomRight = CGPointMake(1093.48, 788.20);
-
-  CGFloat minX = fmin(topLeft.x, bottomLeft.x);
-  CGFloat minY = fmin(topLeft.y, topRight.y);
-  CGFloat maxX = fmax(topRight.x, bottomRight.x);
-  CGFloat maxY = fmax(bottomLeft.y, bottomRight.y);
-
-  self.designatedArea = CGRectMake(minX, minY, maxX - minX, maxY - minY);
-}
+//
+//- (void)calculateAndStoreDesignatedArea {
+//  CGPoint topLeft = CGPointMake(55.38, 1401.08);
+//  CGPoint topRight = CGPointMake(969.23, 1401.08);
+//  CGPoint bottomLeft = CGPointMake(55.38, 882.16);
+//  CGPoint bottomRight = CGPointMake(969.23, 882.16);
+//
+//  CGFloat minX = fmin(topLeft.x, bottomLeft.x);
+//  CGFloat minY = fmin(topLeft.y, topRight.y);
+//  CGFloat maxX = fmax(topRight.x, bottomRight.x);
+//  CGFloat maxY = fmax(bottomLeft.y, bottomRight.y);
+//
+//  self.designatedArea = CGRectMake(minX, minY, maxX - minX, maxY - minY);
+//}
 
 
 - (void)_backgroundMode
@@ -103,12 +103,11 @@
 - (void)setupCameraView
 {
 
-  // 지정 영역 계산 및 저장
-  [self calculateAndStoreDesignatedArea];
+//  // 지정 영역 계산 및 저장
+//  [self calculateAndStoreDesignatedArea];
 
 //    NSLog(@"contrast in camera view : %f",self.);
   [self createGLKView];
-
 
   _isFlutterDetected = false;
 
@@ -126,6 +125,11 @@
     }
   }
   if (!device) return;
+  CMVideoDimensions dimensions = CMVideoFormatDescriptionGetDimensions(device.activeFormat.formatDescription);
+  NSLog(@"delegate setCameraSize1");
+  _cameraWidth = dimensions.height;
+  _cameraHeight = dimensions.width;
+  NSLog(@"카메라 해상도: %ldx%ld", dimensions.width, dimensions.height);
 
   self.imageDetectionConfidence = 0.0;
 
@@ -166,6 +170,62 @@
   }
 
   [session commitConfiguration];
+}
+
+- (void)layoutSubviews {
+  [super layoutSubviews];
+  [self addRectangleOverlay];
+}
+
+- (void)addRectangleOverlay {
+  _shapeLayer = [CAShapeLayer layer];
+  _shapeLayer.strokeColor = [UIColor redColor].CGColor;
+  _shapeLayer.fillColor = [UIColor clearColor].CGColor;
+  _shapeLayer.lineWidth = 4.0;
+
+  // 여기서는 직접 사각형의 위치와 크기를 지정합니다. 실제 사용시에는 적절히 조정해야 합니다.
+  CGRect rectangle = CGRectMake(20, 200, self.frame.size.width - 40, 200);
+
+  // 둥근 모서리의 radius를 설정합니다.
+  CGFloat cornerRadius = 8.0;
+
+  // 둥근 모서리가 적용된 사각형 경로를 생성합니다.
+  UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rectangle cornerRadius:cornerRadius];
+
+  _shapeLayer.path = path.CGPath;
+
+  CGFloat deviceWidth = self.frame.size.width;
+  CGFloat deviceHeight = self.frame.size.height;
+
+  // 앱 화면에서 지정한 영역의 좌표
+  CGFloat appAreaTop = 180.0; // 앱 영역의 상단에서부터의 거리
+  CGFloat appAreaHeight = 240.0; // 앱 영역의 높이
+
+  // 비율 계산
+  CGFloat ratioX = _cameraWidth / deviceWidth;
+  CGFloat ratioY = _cameraHeight / deviceHeight;
+
+  // 앱 화면 좌표를 카메라 좌표계로 변환
+  CGPoint cameraTopLeft = CGPointMake(0, _cameraHeight - (appAreaTop * ratioY));
+  CGPoint cameraTopRight = CGPointMake(_cameraWidth, _cameraHeight - (appAreaTop * ratioY));
+  CGPoint cameraBottomLeft = CGPointMake(0, _cameraHeight - ((appAreaTop + appAreaHeight) * ratioY));
+  CGPoint cameraBottomRight = CGPointMake(_cameraWidth, _cameraHeight - ((appAreaTop + appAreaHeight) * ratioY));
+
+  // 지정된 영역 저장
+  self.designatedArea = CGRectMake(cameraTopLeft.x,
+                                   cameraTopLeft.y,
+                                   cameraTopRight.x - cameraTopLeft.x,
+                                   cameraBottomLeft.y - cameraTopLeft.y);
+
+  NSLog(@"Designated area in camera coordinates: %@", NSStringFromCGRect(self.designatedArea));
+
+  CGFloat centerY = _cameraHeight - ((appAreaTop + (appAreaHeight / 2)) * ratioY);
+  CGPoint focusPoint = CGPointMake(0.5, centerY / _cameraHeight);
+  [self focusAtPoint:focusPoint completionHandler:^{
+      NSLog(@"초점이 지정된 영역에 설정되었습니다.");
+  }];
+
+  [self.layer addSublayer:_shapeLayer];
 }
 
 - (void)setCameraViewType:(IPDFCameraViewType)cameraViewType
@@ -361,9 +421,11 @@
 
       if([device isExposurePointOfInterestSupported] && [device isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure])
       {
+
         [device setExposurePointOfInterest:pointOfInterest];
         [device setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
         completionHandler();
+        NSLog(@"초점이 지정된 영역에 설정되었습니다.");
       }
 
       [device unlockForConfiguration];
@@ -560,30 +622,30 @@
                                 CGRectContainsPoint(self.designatedArea, rectangle.bottomRight) &&
                                 width > 200 && height > 325;
 
-  if (!isWithinDesignatedArea) {
-    if (_isFlutterDetected) {
-      // 감지 중
-      // 감지 정지
-      _isFlutterDetected = false;
-      if (self.delegate && !_isStopped){
-      NSLog(@"ERROR: Rectangle is not within the designated area");
-       [self.delegate onRectangleDetect:_isFlutterDetected];
-      }
-    } else {
-     // 이미 감지 정지
-    }
-    return IPDFRectangeTypeBadAngle;
-  } else {
-    // 영역안에 들어옴
-    if (_isFlutterDetected) {
-      // 감지 중이었음
-    } else {
-      // 감지 중이 아니었음
-      // 감지 중으로 변경
-      _isFlutterDetected = true;
-      if (self.delegate && !_isStopped) {
+  if (_shapeLayer) {
+    if (!isWithinDesignatedArea) {
+      if (_isFlutterDetected) {
+        // 감지 중
+        // 감지 정지
+        _isFlutterDetected = false;
+        if (self.delegate && !_isStopped){
           NSLog(@"ERROR: Rectangle is not within the designated area");
-        [self.delegate onRectangleDetect:_isFlutterDetected];
+          _shapeLayer.strokeColor = [UIColor redColor].CGColor;
+        }
+      }
+      return IPDFRectangeTypeBadAngle;
+    } else {
+      // 영역안에 들어옴
+      if (_isFlutterDetected) {
+        // 감지 중이었음
+      } else {
+        // 감지 중이 아니었음
+        // 감지 중으로 변경
+        _isFlutterDetected = true;
+        if (self.delegate && !_isStopped) {
+          NSLog(@"ERROR: Rectangle is not within the designated area");
+          _shapeLayer.strokeColor = [UIColor greenColor].CGColor;
+        }
       }
     }
   }
